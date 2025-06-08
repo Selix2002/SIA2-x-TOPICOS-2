@@ -1,69 +1,57 @@
-import { Dimensions, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import GymButton from './gymbutton';
+import { useRouter } from 'expo-router'; // Importar useRouter
+import { SafeAreaView, StyleSheet, Text } from 'react-native';
+import MuscleOverlayMap from "../../components/MuscleOverlayMap";
 
-// Obtener el ancho de la pantalla para el dimensionamiento adaptable de la imagen
-const screenWidth = Dimensions.get('window').width;
+const MuscleSelectionView = () => {
+  const router = useRouter(); // Obtener instancia del router
+  const muscleNameToIdMap = {
+    'abdominales': 2,
+    'biceps': 1,
+    'cuadriceps': 3
+  };
+  const defaultObjetivoId = 1; // Hipertrofia
 
-// Dimensiones originales de tu imagen
-const IMAGE_ORIGINAL_WIDTH = 421;
-const IMAGE_ORIGINAL_HEIGHT = 592;
-// Relación de aspecto (alto / ancho) para mantener la proporción
-const IMAGE_ASPECT_RATIO_HEIGHT_TO_WIDTH = IMAGE_ORIGINAL_HEIGHT / IMAGE_ORIGINAL_WIDTH;
+  const handleMuscleSelection = (muscleId) => {
+    console.log("Músculo seleccionado (string) en MuscleSelectionView:", muscleId);
+    const musculo_id_numerico = muscleNameToIdMap[muscleId];
 
-const MuscleSelectionView = ({ // Renombramos para mayor claridad, o puedes mantener HomeView
-  imageSource,
-  containerPadding, // Nueva prop para el padding del contenedor padre
-}) => {
-  // Calcular las dimensiones de visualización para la imagen dentro de HomeView
-  const imageDisplayWidth = screenWidth - (2 * containerPadding);
-  const imageDisplayHeight = imageDisplayWidth * IMAGE_ASPECT_RATIO_HEIGHT_TO_WIDTH;
+    if (musculo_id_numerico) {
+      router.push({
+        pathname: '/(tabs)/lista_ejercicios', // Navegar a la nueva pantalla de lista
+        params: {
+          musculoId: musculo_id_numerico, // ID numérico para la BD
+          objetivoId: defaultObjetivoId, // Objetivo por defecto
+          // Podrías pasar el nombre del músculo también si quieres mostrarlo en el título de la lista
+          nombreMusculo: muscleId.charAt(0).toUpperCase() + muscleId.slice(1)
+        },
+      });
+    } else {
+      console.warn(`No hay un ID numérico mapeado para el músculo: ${muscleId}`);
+    }
+  };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Imagen del tren superior */}
-      <View style={styles.contentContainer}>
-        <Image
-          source={imageSource}
-          style={{
-            width: imageDisplayWidth,
-            height: imageDisplayHeight,
-            resizeMode: 'contain',
-            marginBottom: 40,
-          }}
-        />
-
-        <Text style={styles.titleText}>
-          ¡Elige un músculo!
-        </Text>
-
-        <GymButton label="Bíceps" onPress={() => console.log("Seleccionó biceps")} />
-        <GymButton label="Abdomen" onPress={() => console.log("Seleccionó abdomen")} />
-        <GymButton label="Cuádriceps" onPress={() => console.log("Seleccionó cuádriceps")} />
-
-      </View>
-    </ScrollView>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Toca un músculo</Text>
+      <MuscleOverlayMap
+        onMusclePress={handleMuscleSelection}
+      />
+    </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: '#f4f4f9', 
-  },
-  scrollViewContent: {
-    flexGrow: 1, // Para que el contenido pueda crecer y centrarse si es poco
-  },
-  contentContainer: {
+  container: {
     flex: 1,
-    alignItems: 'center', // Centra los elementos horizontalmente
-    justifyContent: 'center', // Centra los elementos verticalmente si hay espacio
-    paddingTop: 40, // Espacio arriba
-    paddingBottom: 20, // Espacio abajo
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 40,
   },
-  titleText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333', // Un color oscuro para el texto
-    marginBottom: 30, // Espacio debajo del título
+  title: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 12,
   },
 });
 

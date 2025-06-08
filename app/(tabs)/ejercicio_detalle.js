@@ -1,11 +1,18 @@
 // ejercicioDetalle.js
+import { useLocalSearchParams, useRouter } from 'expo-router'; // Importar hooks de Expo Router
 import { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { getEjercicioDetalle } from '../../services/db';
 import GymButton from './gymbutton';
 
-const EjercicioDetalleScreen = ({ route, navigation }) => {
-  const { ejercicioId, frecuenciaId } = route.params;
+const EjercicioDetalleScreen = () => {
+  const params = useLocalSearchParams();
+  const router = useRouter(); // Para la navegación hacia atrás
+
+  // Los parámetros de useLocalSearchParams vienen como strings, convertir a número.
+  const ejercicioId = params.ejercicioId ? parseInt(String(params.ejercicioId), 10) : null;
+  const frecuenciaId = params.frecuenciaId ? parseInt(String(params.frecuenciaId), 10) : null;
+
   const [ejercicio, setEjercicio] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -13,6 +20,10 @@ const EjercicioDetalleScreen = ({ route, navigation }) => {
     const fetchEjercicio = async () => {
       try {
         const detalle = await getEjercicioDetalle(ejercicioId, frecuenciaId);
+        if (!detalle) {
+          // Manejar el caso en que no se encuentren detalles
+          console.warn(`No se encontraron detalles para ejercicioId: ${ejercicioId}, frecuenciaId: ${frecuenciaId}`);
+        }
         setEjercicio(detalle);
       } catch (error) {
         console.error("Error al obtener detalles del ejercicio:", error);
@@ -21,7 +32,10 @@ const EjercicioDetalleScreen = ({ route, navigation }) => {
       }
     };
 
-    fetchEjercicio();
+    // Asegurarse de que los IDs son válidos antes de hacer fetch
+    if (ejercicioId !== null && frecuenciaId !== null) {
+      fetchEjercicio();
+    }
   }, [ejercicioId, frecuenciaId]);
 
   if (loading) {
@@ -32,7 +46,7 @@ const EjercicioDetalleScreen = ({ route, navigation }) => {
     );
   }
 
-  if (!ejercicio) {
+  if (!ejercicio && !loading) { // Mostrar solo si no está cargando y no hay ejercicio
     return (
       <View style={styles.center}>
         <Text>No se encontró el ejercicio</Text>
@@ -81,7 +95,7 @@ const EjercicioDetalleScreen = ({ route, navigation }) => {
         <View style={styles.buttonContainer}>
           <GymButton 
             label="Siguiente" 
-            onPress={() => navigation.goBack()} 
+            onPress={() => router.back()} // Usar router.back()
           />
         </View>
       </View>

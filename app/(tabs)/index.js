@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { initDB } from '../../services/db';
-import InicioScreen from './inicio'; // Importamos la nueva pantalla de inicio
+import MuscleSelectionView from './select_musc';
 
 export default function HomeScreen() {
   useEffect(() => {
@@ -11,7 +11,7 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <InicioScreen />
+    <MuscleSelectionView />
   );
 }
 
