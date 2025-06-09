@@ -213,16 +213,18 @@ export async function getMusculosPorObjetivo(objetivoId) {
 
 // Obtener ejercicios por músculo y objetivo
 export async function getEjerciciosPorMusculo(musculoId, objetivoId) {
-  return db.getAllAsync(`
-    SELECT e.id, e.nombre, e.descripcion 
-    FROM ejercicios e
-    WHERE e.musculo_id = ? AND e.objetivo_id = ?
-  `, [musculoId, objetivoId]);
+  return await db.getAllAsync(
+    `SELECT e.id, e.nombre, e.descripcion 
+     FROM ejercicios e
+     WHERE e.musculo_id = ? AND e.objetivo_id = ?`,
+    [musculoId, objetivoId]
+  );
 }
+
 
 // Obtener detalles completos de un ejercicio
 export async function getEjercicioDetalle(ejercicioId, frecuenciaId) {
-  return db.getAsync(`
+  return await db.getFirstAsync(`
     SELECT 
       e.nombre,
       e.descripcion,
