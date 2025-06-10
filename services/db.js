@@ -45,6 +45,9 @@ export async function initDB() {
 
     // Insertar datos iniciales
     await insertInitialData();
+    
+    // Limpiar duplicados automáticamente después de insertar datos
+    await cleanDuplicatesInternal();
   });
 }
 
@@ -174,6 +177,37 @@ async function insertInitialData() {
   }
 }
 
+// Función interna para limpiar duplicados automáticamente
+async function cleanDuplicatesInternal() {
+  console.log('🧹 Limpiando duplicados automáticamente...');
+  
+  try {
+    // Eliminar duplicados de ejercicios manteniendo el ID más bajo
+    await db.execAsync(`
+      DELETE FROM ejercicios 
+      WHERE id NOT IN (
+        SELECT MIN(id) 
+        FROM ejercicios 
+        GROUP BY nombre, descripcion, musculo_id, objetivo_id
+      )
+    `);
+    
+    // Eliminar duplicados de parámetros
+    await db.execAsync(`
+      DELETE FROM parametros 
+      WHERE id NOT IN (
+        SELECT MIN(id) 
+        FROM parametros 
+        GROUP BY objetivo_id, frecuencia_id, series, repeticiones, descanso
+      )
+    `);
+    
+    console.log('✅ Duplicados limpiados automáticamente');
+  } catch (error) {
+    console.error('❌ Error al limpiar duplicados:', error);
+  }
+}
+
 export async function getRutinas(objetivo, frecuencia) {
   return db.getAllAsync(`
     SELECT e.nombre, e.descripcion, p.series, p.repeticiones, p.descanso 
@@ -211,17 +245,6 @@ export async function getMusculosPorObjetivo(objetivoId) {
   `, [objetivoId]);
 }
 
-// Obtener ejercicios por músculo y objetivo
-export async function getEjerciciosPorMusculo(musculoId, objetivoId) {
-  return await db.getAllAsync(
-    `SELECT e.id, e.nombre, e.descripcion 
-     FROM ejercicios e
-     WHERE e.musculo_id = ? AND e.objetivo_id = ?`,
-    [musculoId, objetivoId]
-  );
-}
-
-
 // Obtener detalles completos de un ejercicio
 export async function getEjercicioDetalle(ejercicioId, frecuenciaId) {
   return await db.getFirstAsync(`
@@ -239,4 +262,81 @@ export async function getEjercicioDetalle(ejercicioId, frecuenciaId) {
     JOIN frecuencias f ON p.frecuencia_id = f.id
     WHERE e.id = ? AND p.frecuencia_id = ?
   `, [ejercicioId, frecuenciaId]);
+}
+
+// Función para obtener ejercicios por músculo con limpieza automática adicional
+export async function getEjerciciosPorMusculo(musculoId, objetivoId) {
+  try {
+    const ejercicios = await db.getAllAsync(
+      `SELECT e.id, e.nombre, e.descripcion 
+       FROM ejercicios e
+       WHERE e.musculo_id = ? AND e.objetivo_id = ?
+       ORDER BY e.nombre`,
+      [musculoId, objetivoId]
+    );
+    
+    // Filtrar duplicados localmente como medida de seguridad adicional
+    const uniqueEjercicios = ejercicios.filter((item, index, self) => 
+      index === self.findIndex(t => t.id === item.id)
+    );
+    
+    if (ejercicios.length !== uniqueEjercicios.length) {
+      console.warn(`⚠️ Se encontraron duplicados locales: ${ejercicios.length} total, ${uniqueEjercicios.length} únicos`);
+    }
+    
+    console.log(`✅ getEjerciciosPorMusculo: ${uniqueEjercicios.length} ejercicios únicos encontrados`);
+    return uniqueEjercicios;
+  } catch (error) {
+    console.error('❌ Error en getEjerciciosPorMusculo:', error);
+    return [];
+  }
+}
+
+// Funciones de debug (mantener para desarrollo)
+export async function debugDatabase() {
+  console.log('🔍 === DEBUG DATABASE ===');
+  
+  const totalEjercicios = await db.getFirstAsync('SELECT COUNT(*) as count FROM ejercicios');
+  console.log(`📊 Total ejercicios en DB: ${totalEjercicios.count}`);
+  
+  const musculos = await db.getAllAsync('SELECT * FROM musculos');
+  console.log('💪 Músculos:', musculos);
+  
+  const objetivos = await db.getAllAsync('SELECT * FROM objetivos');
+  console.log('🎯 Objetivos:', objetivos);
+  
+  const ejerciciosPorCategoria = await db.getAllAsync(`
+    SELECT 
+      m.nombre as musculo,
+      o.nombre as objetivo,
+      COUNT(e.id) as cantidad
+    FROM ejercicios e
+    JOIN musculos m ON e.musculo_id = m.id
+    JOIN objetivos o ON e.objetivo_id = o.id
+    GROUP BY m.nombre, o.nombre
+    ORDER BY m.nombre, o.nombre
+  `);
+  console.log('📋 Ejercicios por categoría:', ejerciciosPorCategoria);
+  
+  return {
+    totalEjercicios: totalEjercicios.count,
+    ejerciciosPorCategoria
+  };
+}
+
+export async function resetDatabase() {
+  console.log('🔄 Reseteando base de datos...');
+  
+  await db.withTransactionAsync(async () => {
+    await db.execAsync(`
+      DROP TABLE IF EXISTS parametros;
+      DROP TABLE IF EXISTS ejercicios;
+      DROP TABLE IF EXISTS frecuencias;
+      DROP TABLE IF EXISTS objetivos;
+      DROP TABLE IF EXISTS musculos;
+    `);
+  });
+  
+  await initDB();
+  console.log('✅ Base de datos reseteada');
 }

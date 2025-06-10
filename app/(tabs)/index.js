@@ -1,22 +1,25 @@
 import { useEffect } from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
 import { initDB } from '../../services/db';
-import MuscleSelectionView from './select_musc';
+import InicioScreen from './inicio';
 
 export default function HomeScreen() {
   useEffect(() => {
-    if (Platform.OS !== 'web') {
-      initDB();
-    }
+    const initializeDatabase = async () => {
+      if (Platform.OS !== 'web') {
+        try {
+          // Inicializar la base de datos
+          await initDB();
+
+          console.log('✅ Base de datos inicializada');
+        } catch (error) {
+          console.error('❌ Error al inicializar la base de datos:', error);
+        }
+      }
+    };
+
+    initializeDatabase();
   }, []);
 
-  return (
-    <MuscleSelectionView />
-  );
+  return <InicioScreen />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-  },
-});

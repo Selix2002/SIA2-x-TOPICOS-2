@@ -94,8 +94,12 @@ const EjercicioDetalleScreen = () => {
         {/* Botón de acción */}
         <View style={styles.buttonContainer}>
           <GymButton 
-            label="Siguiente" 
+            label="Ver más ejercicios" 
             onPress={() => router.back()} // Usar router.back()
+          />
+          <GymButton 
+            label="Volver al inicio" 
+            onPress={() => router.push('/(tabs)/inicio')} // Usar router.push()
           />
         </View>
       </View>

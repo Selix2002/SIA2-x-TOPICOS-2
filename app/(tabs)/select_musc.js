@@ -1,28 +1,41 @@
-import { useRouter } from 'expo-router'; // Importar useRouter
+// select_musc.js (actualizado)
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView, StyleSheet, Text } from 'react-native';
 import MuscleOverlayMap from "../../components/MuscleOverlayMap";
 
 const MuscleSelectionView = () => {
-  const router = useRouter(); // Obtener instancia del router
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  
+  // Obtener los parámetros pasados desde la pantalla de inicio
+  const objetivoId = params.objetivoId ? parseInt(params.objetivoId) : 1; // Default hipertrofia
+  const objetivoNombre = params.objetivoNombre || 'Hipertrofia';
+  const frecuenciaId = params.frecuenciaId ? parseInt(params.frecuenciaId) : 2; // Default 1-3 h/semana
+  const frecuenciaNivel = params.frecuenciaNivel || '1–3 h/semana';
+
   const muscleNameToIdMap = {
     'abdominales': 2,
     'biceps': 1,
     'cuadriceps': 3
   };
-  const defaultObjetivoId = 1; // Hipertrofia
 
   const handleMuscleSelection = (muscleId) => {
-    console.log("Músculo seleccionado (string) en MuscleSelectionView:", muscleId);
+    console.log("Músculo seleccionado:", muscleId);
+    console.log("Con objetivo:", objetivoNombre, "ID:", objetivoId);
+    console.log("Con frecuencia:", frecuenciaNivel, "ID:", frecuenciaId);
+    
     const musculo_id_numerico = muscleNameToIdMap[muscleId];
 
     if (musculo_id_numerico) {
       router.push({
-        pathname: '/(tabs)/lista_ejercicios', // Navegar a la nueva pantalla de lista
+        pathname: '/(tabs)/lista_ejercicios',
         params: {
-          musculoId: musculo_id_numerico, // ID numérico para la BD
-          objetivoId: defaultObjetivoId, // Objetivo por defecto
-          // Podrías pasar el nombre del músculo también si quieres mostrarlo en el título de la lista
-          nombreMusculo: muscleId.charAt(0).toUpperCase() + muscleId.slice(1)
+          musculoId: musculo_id_numerico,
+          objetivoId: objetivoId,
+          frecuenciaId: frecuenciaId, // Ahora también pasamos frecuenciaId
+          nombreMusculo: muscleId.charAt(0).toUpperCase() + muscleId.slice(1),
+          objetivoNombre: objetivoNombre,
+          frecuenciaNivel: frecuenciaNivel
         },
       });
     } else {
@@ -33,6 +46,9 @@ const MuscleSelectionView = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Toca un músculo</Text>
+      <Text style={styles.subtitle}>
+        Objetivo: {objetivoNombre} | Actividad: {frecuenciaNivel}
+      </Text>
       <MuscleOverlayMap
         onMusclePress={handleMuscleSelection}
       />
@@ -51,7 +67,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "600",
-    marginBottom: 12,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+    paddingHorizontal: 20,
   },
 });
 
