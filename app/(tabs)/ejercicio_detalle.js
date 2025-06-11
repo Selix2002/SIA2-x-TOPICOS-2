@@ -9,32 +9,32 @@ import GymButton from './gymbutton';
 // Función para mapear ejercicios a videos (directamente en el archivo)
 const getVideoForExercise = (exerciseName) => {
   const videoMap = {
-    'Bicycle crunch': require('../../assets/Bicycle_crunch.webm'),
-    'Burpee con curl de bíceps': require('../../assets/Burpee_con_curl_de_bíceps.webm'),
-    'Chin-up supino (negativos asistidos)': require('../../assets/Chin-up_supino(negativos_asistidos).webm'),
-    'Crunch con carga': require('../../assets/Crunch_con_carga.webm'),
-    'Curl alterno con mancuerna': require('../../assets/Curl_alterno_con_mancuerna.webm'),
-    'Curl alterno con mancuerna y salto ligero': require('../../assets/Curl_alterno_con_mancuerna_y_salto_ligero.webm'),
-    'Curl con banda en zona de pulsos': require('../../assets/Curl_con_banda_en_zona_de_pulsos.webm'),
-    'Curl con banda elástica': require('../../assets/Curl_de_bíceps con_banda_elástica.webm'),
-    'Curl rápido con banda elástica': require('../../assets/Curl_rápido_con_banda_elástica.webm'),
-    'Elevación de piernas tumbado': require('../../assets/Elevación_de_piernas_tumbado.webm'),
-    'Flutter kicks': require('../../assets/Flutter_kicks.webm'),
-    'Jump squats': require('../../assets/Jump_squats.mp4'),
-    'Jumping lunges': require('../../assets/Jumping_lunges.webm'),
-    'Mountain climbers': require('../../assets/Mountain_climbers.mp4'),
-    'Plank jacks': require('../../assets/Plank_jacks.webm'),
-    'Plank to knee-tap': require('../../assets/Plank_to_knee-tap.webm'),
-    'Renegade row alterno': require('../../assets/Renegade_row_alterno.webm'),
-    'Russian twists con peso': require('../../assets/Russian_twists_con_peso.webm'),
-    'Russian twists rápidos': require('../../assets/Russian_twists_rápidos.webm'),
-    'Sentadilla búlgara': require('../../assets/Sentadilla_búlgara.webm'),
-    'Sentadilla con mochila': require('../../assets/Sentadilla_con_mochila.webm'),
-    'Squat + Curl de bíceps': require('../../assets/Squat_+_Curl_de_bíceps.mp4'),
-    'Step-ups en escalón': require('../../assets/Step-ups_en_escalón.webm'),
-    'Tuck jumps': require('../../assets/Tuck_jumps.webm'),
-    'Walking lunges dinámicos': require('../../assets/Walking_lunges_dinámicos.webm'),
-    'Zancadas inversas': require('../../assets/Zancadas_inversas.webm'),
+    'Bicycle crunch': require('../../assets/vids//Bicycle_crunch.webm'),
+    'Burpee con curl de bíceps': require('../../assets/vids//Burpee_con_curl_de_bíceps.webm'),
+    'Chin-up supino (negativos asistidos)': require('../../assets/vids//Chin-up_supino(negativos_asistidos).webm'),
+    'Crunch con carga': require('../../assets/vids//Crunch_con_carga.webm'),
+    'Curl alterno con mancuerna': require('../../assets/vids//Curl_alterno_con_mancuerna.webm'),
+    'Curl alterno con mancuerna y salto ligero': require('../../assets/vids//Curl_alterno_con_mancuerna_y_salto_ligero.webm'),
+    'Curl con banda en zona de pulsos': require('../../assets/vids//Curl_con_banda_en_zona_de_pulsos.webm'),
+    'Curl con banda elástica': require('../../assets/vids//Curl_de_bíceps con_banda_elástica.webm'),
+    'Curl rápido con banda elástica': require('../../assets/vids//Curl_rápido_con_banda_elástica.webm'),
+    'Elevación de piernas tumbado': require('../../assets/vids//Elevación_de_piernas_tumbado.webm'),
+    'Flutter kicks': require('../../assets/vids//Flutter_kicks.webm'),
+    'Jump squats': require('../../assets/vids//Jump_squats.mp4'),
+    'Jumping lunges': require('../../assets/vids//Jumping_lunges.webm'),
+    'Mountain climbers': require('../../assets/vids//Mountain_climbers.mp4'),
+    'Plank jacks': require('../../assets/vids//Plank_jacks.webm'),
+    'Plank to knee-tap': require('../../assets/vids//Plank_to_knee-tap.webm'),
+    'Renegade row alterno': require('../../assets/vids//Renegade_row_alterno.webm'),
+    'Russian twists con peso': require('../../assets/vids//Russian_twists_con_peso.webm'),
+    'Russian twists rápidos': require('../../assets/vids//Russian_twists_rápidos.webm'),
+    'Sentadilla búlgara': require('../../assets/vids//Sentadilla_búlgara.webm'),
+    'Sentadilla con mochila': require('../../assets/vids//Sentadilla_con_mochila.webm'),
+    'Squat + Curl de bíceps': require('../../assets/vids//Squat_+_Curl_de_bíceps.mp4'),
+    'Step-ups en escalón': require('../../assets/vids//Step-ups_en_escalón.webm'),
+    'Tuck jumps': require('../../assets/vids//Tuck_jumps.webm'),
+    'Walking lunges dinámicos': require('../../assets/vids//Walking_lunges_dinámicos.webm'),
+    'Zancadas inversas': require('../../assets/vids//Zancadas_inversas.webm'),
   };
 
   return videoMap[exerciseName] || null;
@@ -45,32 +45,32 @@ const getVideoForExerciseNormalized = (exerciseName) => {
   const normalizedName = exerciseName.trim().toLowerCase();
   
   const videoMapNormalized = {
-    'bicycle crunch': require('../../assets/Bicycle_crunch.webm'),
-    'burpee con curl de bíceps': require('../../assets/Burpee_con_curl_de_bíceps.webm'),
-    'chin-up supino (negativos asistidos)': require('../../assets/Chin-up_supino(negativos_asistidos).webm'),
-    'crunch con carga': require('../../assets/Crunch_con_carga.webm'),
-    'curl alterno con mancuerna': require('../../assets/Curl_alterno_con_mancuerna.webm'),
-    'curl alterno con mancuerna y salto ligero': require('../../assets/Curl_alterno_con_mancuerna_y_salto_ligero.webm'),
-    'curl con banda en zona de pulsos': require('../../assets/Curl_con_banda_en_zona_de_pulsos.webm'),
-    'curl con banda elástica': require('../../assets/Curl_de_bíceps con_banda_elástica.webm'),
-    'curl rápido con banda elástica': require('../../assets/Curl_rápido_con_banda_elástica.webm'),
-    'elevación de piernas tumbado': require('../../assets/Elevación_de_piernas_tumbado.webm'),
-    'flutter kicks': require('../../assets/Flutter_kicks.webm'),
-    'jump squats': require('../../assets/Jump_squats.mp4'),
-    'jumping lunges': require('../../assets/Jumping_lunges.webm'),
-    'mountain climbers': require('../../assets/Mountain_climbers.mp4'),
-    'plank jacks': require('../../assets/Plank_jacks.webm'),
-    'plank to knee-tap': require('../../assets/Plank_to_knee-tap.webm'),
-    'renegade row alterno': require('../../assets/Renegade_row_alterno.webm'),
-    'russian twists con peso': require('../../assets/Russian_twists_con_peso.webm'),
-    'russian twists rápidos': require('../../assets/Russian_twists_rápidos.webm'),
-    'sentadilla búlgara': require('../../assets/Sentadilla_búlgara.webm'),
-    'sentadilla con mochila': require('../../assets/Sentadilla_con_mochila.webm'),
-    'squat + curl de bíceps': require('../../assets/Squat_+_Curl_de_bíceps.mp4'),
-    'step-ups en escalón': require('../../assets/Step-ups_en_escalón.webm'),
-    'tuck jumps': require('../../assets/Tuck_jumps.webm'),
-    'walking lunges dinámicos': require('../../assets/Walking_lunges_dinámicos.webm'),
-    'zancadas inversas': require('../../assets/Zancadas_inversas.webm'),
+    'bicycle crunch': require('../../assets/vids/Bicycle_crunch.webm'),
+    'burpee con curl de bíceps': require('../../assets/vids/Burpee_con_curl_de_bíceps.webm'),
+    'chin-up supino (negativos asistidos)': require('../../assets/vids/Chin-up_supino(negativos_asistidos).webm'),
+    'crunch con carga': require('../../assets/vids/Crunch_con_carga.webm'),
+    'curl alterno con mancuerna': require('../../assets/vids/Curl_alterno_con_mancuerna.webm'),
+    'curl alterno con mancuerna y salto ligero': require('../../assets/vids/Curl_alterno_con_mancuerna_y_salto_ligero.webm'),
+    'curl con banda en zona de pulsos': require('../../assets/vids/Curl_con_banda_en_zona_de_pulsos.webm'),
+    'curl con banda elástica': require('../../assets/vids/Curl_de_bíceps con_banda_elástica.webm'),
+    'curl rápido con banda elástica': require('../../assets/vids/Curl_rápido_con_banda_elástica.webm'),
+    'elevación de piernas tumbado': require('../../assets/vids/Elevación_de_piernas_tumbado.webm'),
+    'flutter kicks': require('../../assets/vids/Flutter_kicks.webm'),
+    'jump squats': require('../../assets/vids/Jump_squats.mp4'),
+    'jumping lunges': require('../../assets/vids/Jumping_lunges.webm'),
+    'mountain climbers': require('../../assets/vids/Mountain_climbers.mp4'),
+    'plank jacks': require('../../assets/vids/Plank_jacks.webm'),
+    'plank to knee-tap': require('../../assets/vids/Plank_to_knee-tap.webm'),
+    'renegade row alterno': require('../../assets/vids/Renegade_row_alterno.webm'),
+    'russian twists con peso': require('../../assets/vids/Russian_twists_con_peso.webm'),
+    'russian twists rápidos': require('../../assets/vids/Russian_twists_rápidos.webm'),
+    'sentadilla búlgara': require('../../assets/vids/Sentadilla_búlgara.webm'),
+    'sentadilla con mochila': require('../../assets/vids/Sentadilla_con_mochila.webm'),
+    'squat + curl de bíceps': require('../../assets/vids/Squat_+_Curl_de_bíceps.mp4'),
+    'step-ups en escalón': require('../../assets/vids/Step-ups_en_escalón.webm'),
+    'tuck jumps': require('../../assets/vids/Tuck_jumps.webm'),
+    'walking lunges dinámicos': require('../../assets/vids/Walking_lunges_dinámicos.webm'),
+    'zancadas inversas': require('../../assets/vids/Zancadas_inversas.webm'),
   };
 
   return videoMapNormalized[normalizedName] || null;
@@ -187,9 +187,9 @@ const EjercicioDetalleScreen = () => {
               source={videoSource}
               rate={1.0}
               volume={1.0}
-              isMuted={false}
+              isMuted={true}
               resizeMode="contain"
-              shouldPlay={false}
+              shouldPlay={true}
               isLooping={true}
               useNativeControls
               style={styles.video}
