@@ -1,7 +1,6 @@
-// objetivo_selection.js (corregido)
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getObjetivos } from '../../services/db';
 
 const ObjetivoSelectionScreen = () => {
@@ -50,29 +49,41 @@ const ObjetivoSelectionScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text>Cargando objetivos...</Text>
-      </View>
+      <ImageBackground
+        source={require('../../assets/template.jpg')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        <View style={styles.center}>
+          <Text style={styles.loadingText}>Cargando objetivos...</Text>
+        </View>
+      </ImageBackground>
     );
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Selecciona tu Objetivo</Text>
-        
-        <View style={styles.optionsContainer}>
-          {objetivos.map((objetivo) => (
-            <TouchableOpacity
-              key={objetivo.id}
-              style={styles.optionButton}
-              onPress={() => handleObjetivoSelect(objetivo.id, objetivo.nombre)}
-            >
-              <Text style={styles.optionText}>{objetivo.nombre}</Text>
-            </TouchableOpacity>
-          ))}
+      <ImageBackground
+        source={require('../../assets/template.jpg')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        <View style={styles.container}>
+          <Text style={styles.title}>Selecciona tu Objetivo</Text>
+         
+          <View style={styles.optionsContainer}>
+            {objetivos.map((objetivo) => (
+              <TouchableOpacity
+                key={objetivo.id}
+                style={styles.optionButton}
+                onPress={() => handleObjetivoSelect(objetivo.id, objetivo.nombre)}
+              >
+                <Text style={styles.optionText}>{objetivo.nombre}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
-      </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -80,44 +91,59 @@ const ObjetivoSelectionScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f4f4f9',
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
   container: {
     flex: 1,
     padding: 20,
+    paddingTop: 60,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingText: {
+    fontSize: 18,
+    color: '#fff',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 15,
+    borderRadius: 10,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 30,
-    color: '#333',
+    marginTop: 50, 
+    marginBottom: 15, 
+    color: '#000',
+    padding: 15,
+    borderRadius: 10,
   },
   optionsContainer: {
     flex: 1,
     justifyContent: 'center',
   },
   optionButton: {
-    backgroundColor: 'white',
+    backgroundColor: '#4CAF50',
     padding: 20,
     marginVertical: 10,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 5,
   },
   optionText: {
     fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
-    color: '#333',
+    color: '#fff',
   },
 });
 

@@ -1,10 +1,10 @@
 import { useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 
-const GymButton = ({ label, onPress }) => {
+const GymButton = ({ label, onPress, style }) => {
   // useRef para mantener la instancia de Animated.Value entre renders
   const scaleAnim = useRef(new Animated.Value(1)).current;
-
+  
   const onPressIn = () => {
     // Animación para escalar hacia abajo cuando se presiona
     Animated.spring(scaleAnim, {
@@ -12,7 +12,7 @@ const GymButton = ({ label, onPress }) => {
       useNativeDriver: true, // Es bueno para el rendimiento
     }).start();
   };
-
+  
   const onPressOut = () => {
     // Animación para escalar de vuelta a la normalidad cuando se suelta
     Animated.spring(scaleAnim, {
@@ -22,20 +22,40 @@ const GymButton = ({ label, onPress }) => {
       useNativeDriver: true,
     }).start();
   };
-
+  
   // Estilo animado que se aplicará
   const animatedStyle = {
     transform: [{ scale: scaleAnim }],
   };
-
+  
+  // Determinar el color de fondo basado en el estilo personalizado
+  const getBackgroundColor = (pressed) => {
+    if (style?.backgroundColor) {
+      return pressed ? darkenColor(style.backgroundColor) : style.backgroundColor;
+    }
+    return pressed ? '#45A049' : '#4CAF50'; // Verde por defecto
+  };
+  
+  // Función para oscurecer el color cuando se presiona
+  const darkenColor = (color) => {
+    // Mapeo simple de colores verdes comunes
+    const colorMap = {
+      '#4CAF50': '#45A049',
+      '#2E7D32': '#1B5E20',
+      '#A5D6A7': '#81C784',
+    };
+    return colorMap[color] || '#45A049';
+  };
+  
   return (
     <Pressable
       onPress={onPress} // La acción principal del botón
       onPressIn={onPressIn} // Inicia la animación de presionar
       onPressOut={onPressOut} // Inicia la animación de soltar
       style={({ pressed }) => [
-        styles.pressableRoot, // Estilos para el contenedor Pressable
-        { backgroundColor: pressed ? '#5B8BFF' : '#4C6DFF' }, // Cambia el color de fondo si está presionado
+        styles.pressableRoot,
+        { backgroundColor: getBackgroundColor(pressed) },
+        style, // Aplicar estilos personalizados
       ]}
     >
       <Animated.View style={[styles.animatedContent, animatedStyle]}>
@@ -46,13 +66,18 @@ const GymButton = ({ label, onPress }) => {
 };
 
 const styles = StyleSheet.create({
-  pressableRoot: { // Estilos para el componente Pressable (contenedor exterior)
-    width: '80%', // Para que ocupe un buen ancho
-    minWidth: 250, // Un ancho mínimo
+  pressableRoot: {
+    width: '80%',
+    minWidth: 250,
     marginBottom: 12,
-    borderRadius: 8, // Aplicar borderRadius aquí para que el backgroundColor se vea contenido
+    borderRadius: 12, // Bordes más redondeados
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  animatedContent: { // Estilos para el Animated.View (contenido interior que se anima)
+  animatedContent: {
     paddingVertical: 16,
     paddingHorizontal: 32,
     alignItems: 'center',
@@ -62,6 +87,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 });
 

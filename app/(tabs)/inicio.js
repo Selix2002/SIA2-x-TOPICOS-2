@@ -1,7 +1,7 @@
-// inicio.js (corregido y mejorado)
+// inicio.js (con imagen de fondo, botones verdes y logo)
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Image, ImageBackground, SafeAreaView, StyleSheet, View } from 'react-native';
 import GymButton from './gymbutton';
 
 const InicioScreen = () => {
@@ -130,52 +130,45 @@ const InicioScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
+      <ImageBackground
+        source={require('../../assets/interfaz1.png')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        {/* Logo en la esquina superior derecha */}
+        <View style={styles.logoContainer}>
           <Image
-            source={require('../../assets/logoapp.png')}
+            source={require('../../assets/logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
         </View>
 
-        <View style={styles.middleButtonsContainer}>
-          <GymButton 
-            label={getObjetivoButtonText()} 
-            onPress={handleObjetivoPress}
-            style={selectedObjetivo ? styles.selectedButton : null}
-          />
-          <GymButton 
-            label={getActividadButtonText()} 
-            onPress={handleActividadPress}
-            style={selectedFrecuencia ? styles.selectedButton : null}
-          />
-        </View>
-
-        {/* Mostrar información de selecciones actuales */}
-        {(selectedObjetivo || selectedFrecuencia) && (
-          <View style={styles.selectionInfo}>
-            {selectedObjetivo && (
-              <Text style={styles.selectionText}>
-                ✓ Objetivo: {selectedObjetivo.nombre}
-              </Text>
-            )}
-            {selectedFrecuencia && (
-              <Text style={styles.selectionText}>
-                ✓ Actividad: {selectedFrecuencia.nivel}
-              </Text>
-            )}
+        <View style={styles.container}>
+          {/* Botones superiores - arriba de la mujer */}
+          <View style={styles.topButtonsContainer}>
+            <GymButton 
+              label={getObjetivoButtonText()} 
+              onPress={handleObjetivoPress}
+              style={styles.Button}
+            />
+            <GymButton 
+              label={getActividadButtonText()} 
+              onPress={handleActividadPress}
+              style={styles.Button}
+            />
           </View>
-        )}
 
-        <View style={styles.bottomButtonContainer}>
-          <GymButton 
-            label="Aceptar" 
-            onPress={handleAcceptPress}
-            style={selectedObjetivo && selectedFrecuencia ? styles.enabledAcceptButton : styles.disabledAcceptButton}
-          />
+          {/* Botón inferior - abajo de la mujer */}
+          <View style={styles.bottomButtonContainer}>
+            <GymButton 
+              label="Aceptar" 
+              onPress={handleAcceptPress}
+              style={selectedObjetivo && selectedFrecuencia ? styles.enabledButton : styles.disabledButton}
+            />
+          </View>
         </View>
-      </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -183,7 +176,21 @@ const InicioScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f4f4f9',
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  logoContainer: {
+    position: 'absolute',
+    top: 20, 
+    right: 8,
+    zIndex: 10,
+  },
+  logo: {
+    width: 125,
+    height: 125,
   },
   container: {
     flex: 1,
@@ -192,50 +199,44 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 30,
   },
-  headerContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  logo: {
-    width: 300,
-    height: 150,
-  },
-  middleButtonsContainer: {
+  topButtonsContainer: {
     width: '100%',
     alignItems: 'center',
+    marginTop: 105,
+    paddingTop: 20,
   },
   selectionInfo: {
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Fondo semi-transparente
     padding: 15,
     borderRadius: 10,
     marginVertical: 10,
-    width: '100%',
+    width: '90%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   selectionText: {
     fontSize: 16,
-    color: '#4C6DFF',
+    color: '#2E7D32',
     marginVertical: 2,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   bottomButtonContainer: {
     width: '100%',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 10, // Espacio desde la parte inferior
+    paddingBottom: 20,
   },
-  selectedButton: {
-    backgroundColor: '#4C6DFF',
+  Button: {
+    backgroundColor: '#4CAF50',
   },
-  enabledAcceptButton: {
-    backgroundColor: '#28a745',
+  enabledButton: {
+    backgroundColor: '#357DB6',
   },
-  disabledAcceptButton: {
-    backgroundColor: '#ccc',
+  disabledButton: {
+    backgroundColor: '#357DB6',
   },
 });
 
