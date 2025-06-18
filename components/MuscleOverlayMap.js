@@ -8,42 +8,54 @@ import {
 } from "react-native";
 
 export default function MuscleOverlayMap({ onMusclePress }) {
-  // 1) Obtenemos anchura de pantalla y calculamos proporción de la imagen
   const { width: screenW } = Dimensions.get("window");
-
-  // Queremos que nuestra imagen ocupe el 90% del ancho de pantalla:
   const imgWidth = screenW * 0.9;
-
-  // Si la imagen original mide 1000×1400 px, el alto en pantalla debe ser:
   const imgHeight = (imgWidth * 1400) / 1000;
 
-  // 2) Definimos las coordenadas “originales” de cada músculo en la imagen 1000×1400:
-  //    Ya vimos que:
-  //    - Abdomen:     [x=395, y=448, w=163, h=269]
-  //    - Cuádriceps:  [x=337, y=721, w=108, h=241]
-  //    - Bíceps:      [x=605, y=374, w= 92, h=206]
-
+  // 2) Definimos las coordenadas "originales" de cada músculo en la imagen 1000×1400:
+  //    Lado derecho (coordenadas existentes):
   const rectAbdomen_original = { x: 395, y: 448, w: 163, h: 269 };
-  const rectCuad_original   = { x: 337, y: 721, w: 108, h: 241 };
-  const rectBiceps_original = { x: 605, y: 374, w:  92, h: 206 };
+  const rectCuadDerecho_original = { x: 337, y: 721, w: 108, h: 241 };
+  const rectBicesDerecho_original = { x: 605, y: 374, w: 92, h: 206 };
 
-  // 3) Convertimos cada uno a “pixeles en pantalla”:
+  // Lado izquierdo (coordenadas calculadas simétricamente):
+  // Para el cuádriceps izquierdo: si el derecho está en x=337, el izquierdo estaría aproximadamente en x=555
+  // Para el bíceps izquierdo: si el derecho está en x=605, el izquierdo estaría aproximadamente en x=303
+  const rectCuadIzquierdo_original = { x: 555, y: 721, w: 108, h: 241 };
+  const rectBicesIzquierdo_original = { x: 303, y: 374, w: 92, h: 206 };
+
+  //  Conversión pixeles por pantalla
+  // Abdomen (centro)
   const leftAbdomen = (rectAbdomen_original.x / 1000) * imgWidth;
-  const topAbdomen  = (rectAbdomen_original.y / 1400) * imgHeight;
-  const widthAbdomen  = (rectAbdomen_original.w / 1000) * imgWidth;
+  const topAbdomen = (rectAbdomen_original.y / 1400) * imgHeight;
+  const widthAbdomen = (rectAbdomen_original.w / 1000) * imgWidth;
   const heightAbdomen = (rectAbdomen_original.h / 1400) * imgHeight;
 
-  const leftCuad = (rectCuad_original.x / 1000) * imgWidth;
-  const topCuad  = (rectCuad_original.y / 1400) * imgHeight;
-  const widthCuad  = (rectCuad_original.w / 1000) * imgWidth;
-  const heightCuad = (rectCuad_original.h / 1400) * imgHeight;
+  // Cuádriceps derecho
+  const leftCuadDer = (rectCuadDerecho_original.x / 1000) * imgWidth;
+  const topCuadDer = (rectCuadDerecho_original.y / 1400) * imgHeight;
+  const widthCuadDer = (rectCuadDerecho_original.w / 1000) * imgWidth;
+  const heightCuadDer = (rectCuadDerecho_original.h / 1400) * imgHeight;
 
-  const leftBice = (rectBiceps_original.x / 1000) * imgWidth;
-  const topBice  = (rectBiceps_original.y / 1400) * imgHeight;
-  const widthBice  = (rectBiceps_original.w / 1000) * imgWidth;
-  const heightBice = (rectBiceps_original.h / 1400) * imgHeight;
+  // Cuádriceps izquierdo
+  const leftCuadIzq = (rectCuadIzquierdo_original.x / 1000) * imgWidth;
+  const topCuadIzq = (rectCuadIzquierdo_original.y / 1400) * imgHeight;
+  const widthCuadIzq = (rectCuadIzquierdo_original.w / 1000) * imgWidth;
+  const heightCuadIzq = (rectCuadIzquierdo_original.h / 1400) * imgHeight;
 
-  // 4) Estado para resaltar la última área tocada (opcional)
+  // Bíceps derecho
+  const leftBiceDer = (rectBicesDerecho_original.x / 1000) * imgWidth;
+  const topBiceDer = (rectBicesDerecho_original.y / 1400) * imgHeight;
+  const widthBiceDer = (rectBicesDerecho_original.w / 1000) * imgWidth;
+  const heightBiceDer = (rectBicesDerecho_original.h / 1400) * imgHeight;
+
+  // Bíceps izquierdo
+  const leftBiceIzq = (rectBicesIzquierdo_original.x / 1000) * imgWidth;
+  const topBiceIzq = (rectBicesIzquierdo_original.y / 1400) * imgHeight;
+  const widthBiceIzq = (rectBicesIzquierdo_original.w / 1000) * imgWidth;
+  const heightBiceIzq = (rectBicesIzquierdo_original.h / 1400) * imgHeight;
+
+  // Estado para resaltar la última área tocada (opcional)
   const [selected, setSelected] = useState(null);
 
   const handlePress = (id) => {
@@ -62,7 +74,7 @@ export default function MuscleOverlayMap({ onMusclePress }) {
         resizeMode="contain"
       >
         {/*
-          AREA 1: Abdomen
+          AREA 1: Abdomen (centro)
         */}
         <TouchableOpacity
           onPress={() => handlePress("abdominales")}
@@ -72,7 +84,6 @@ export default function MuscleOverlayMap({ onMusclePress }) {
             top: topAbdomen,
             width: widthAbdomen,
             height: heightAbdomen,
-            // Durante calibración, puedes ver el área con un fondo semitransparente:
             backgroundColor:
               selected === "abdominales" ? "rgba(0, 0, 255, 0.2)" : "transparent",
             borderWidth: selected === "abdominales" ? 1 : 0,
@@ -87,10 +98,10 @@ export default function MuscleOverlayMap({ onMusclePress }) {
           onPress={() => handlePress("cuadriceps")}
           style={{
             position: "absolute",
-            left: leftCuad,
-            top: topCuad,
-            width: widthCuad,
-            height: heightCuad,
+            left: leftCuadDer,
+            top: topCuadDer,
+            width: widthCuadDer,
+            height: heightCuadDer,
             backgroundColor:
               selected === "cuadriceps" ? "rgba(0, 255, 0, 0.2)" : "transparent",
             borderWidth: selected === "cuadriceps" ? 1 : 0,
@@ -99,16 +110,52 @@ export default function MuscleOverlayMap({ onMusclePress }) {
         />
 
         {/*
-          AREA 3: Bíceps derecho (o izquierdo, según prefieras)
+          AREA 3: Cuádriceps izquierdo
+        */}
+        <TouchableOpacity
+          onPress={() => handlePress("cuadriceps")}
+          style={{
+            position: "absolute",
+            left: leftCuadIzq,
+            top: topCuadIzq,
+            width: widthCuadIzq,
+            height: heightCuadIzq,
+            backgroundColor:
+              selected === "cuadriceps" ? "rgba(0, 255, 0, 0.2)" : "transparent",
+            borderWidth: selected === "cuadriceps" ? 1 : 0,
+            borderColor: "rgba(0, 255, 0, 0.5)",
+          }}
+        />
+
+        {/*
+          AREA 4: Bíceps derecho
         */}
         <TouchableOpacity
           onPress={() => handlePress("biceps")}
           style={{
             position: "absolute",
-            left: leftBice,
-            top: topBice,
-            width: widthBice,
-            height: heightBice,
+            left: leftBiceDer,
+            top: topBiceDer,
+            width: widthBiceDer,
+            height: heightBiceDer,
+            backgroundColor:
+              selected === "biceps" ? "rgba(255, 0, 0, 0.2)" : "transparent",
+            borderWidth: selected === "biceps" ? 1 : 0,
+            borderColor: "rgba(255, 0, 0, 0.5)",
+          }}
+        />
+
+        {/*
+          AREA 5: Bíceps izquierdo
+        */}
+        <TouchableOpacity
+          onPress={() => handlePress("biceps")}
+          style={{
+            position: "absolute",
+            left: leftBiceIzq,
+            top: topBiceIzq,
+            width: widthBiceIzq,
+            height: heightBiceIzq,
             backgroundColor:
               selected === "biceps" ? "rgba(255, 0, 0, 0.2)" : "transparent",
             borderWidth: selected === "biceps" ? 1 : 0,
