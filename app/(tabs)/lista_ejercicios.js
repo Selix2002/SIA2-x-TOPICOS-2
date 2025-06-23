@@ -1,7 +1,8 @@
 // lista_ejercicios.js (limpio y optimizado)
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getEjerciciosPorMusculo } from '../../services/db';
 
 const ListaEjerciciosScreen = () => {
@@ -77,6 +78,8 @@ const ListaEjerciciosScreen = () => {
     });
   }, [router, frecuenciaId]);
 
+  const handleBackPress = () => router.back();
+
   // Función para renderizar cada item (memoizada)
   const renderEjercicio = useCallback(({ item }) => (
     <TouchableOpacity 
@@ -92,62 +95,84 @@ const ListaEjerciciosScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.loadingText}>Cargando ejercicios...</Text>
-      </View>
+      <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
+        <View style={styles.center}>
+          <View style={styles.centerCard}>
+            <Text style={styles.loadingText}>Cargando ejercicios...</Text>
+          </View>
+        </View>
+      </ImageBackground>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.errorTitle}>Error</Text>
-        <Text style={styles.errorMessage}>{error}</Text>
-        <TouchableOpacity 
-          style={styles.retryButton} 
-          onPress={fetchEjercicios}
-        >
-          <Text style={styles.retryButtonText}>Reintentar</Text>
-        </TouchableOpacity>
-      </View>
+      <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
+        <View style={styles.center}>
+          <View style={styles.centerCard}>
+            <Text style={styles.errorTitle}>Error</Text>
+            <Text style={styles.errorMessage}>{error}</Text>
+            <TouchableOpacity 
+              style={styles.retryButton} 
+              onPress={fetchEjercicios}
+            >
+              <Text style={styles.retryButtonText}>Reintentar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ImageBackground>
     );
   }
 
   if (!ejercicios || ejercicios.length === 0) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.noResultsTitle}>
-          No se encontraron ejercicios
-        </Text>
-        <Text style={styles.noResultsSubtitle}>
-          Para {nombreMusculo} con objetivo de {objetivoNombre}
-        </Text>
-      </View>
+      <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
+        <View style={styles.center}>
+          <View style={styles.centerCard}>
+            <Text style={styles.noResultsTitle}>
+              No se encontraron ejercicios
+            </Text>
+            <Text style={styles.noResultsSubtitle}>
+              Para {nombreMusculo} con objetivo de {objetivoNombre}
+            </Text>
+          </View>
+        </View>
+      </ImageBackground>
     );
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.title}>Ejercicios para {nombreMusculo}</Text>
-        <Text style={styles.subtitle}>
-          {objetivoNombre} • {frecuenciaNivel}
-        </Text>
-      </View>
-      
-      <FlatList
-        data={ejercicios}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderEjercicio}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        // Propiedades para optimizar rendimiento
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={10}
-        windowSize={10}
-        // Evitar re-renders innecesarios
-        getItemLayout={undefined} // Solo si los items tienen altura fija
-      />
+      <ImageBackground
+        source={require('../../assets/template.jpg')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.title}>Ejercicios para {nombreMusculo}</Text>
+              <Text style={styles.subtitle}>
+                {objetivoNombre} • {frecuenciaNivel}
+              </Text>
+            </View>
+          </View>
+          
+          <FlatList
+            data={ejercicios}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderEjercicio}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={10}
+            windowSize={10}
+          />
+        </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -155,68 +180,96 @@ const ListaEjerciciosScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f4f4f9',
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  container: {
+    flex: 1,
+    padding: 20,
+    paddingTop: 60,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
-  headerContainer: {
-    paddingHorizontal: 15,
-    paddingVertical: 20,
-    backgroundColor: 'white',
+  centerCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 12,
+    padding: 30,
+    width: '80%',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 5,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    marginBottom: 20,
+  },
+  backButton: {
+    padding: 8,
+    marginRight: 12,
+    backgroundColor: '#4CAF50',
+    borderRadius: 8,
+  },
+  headerTextContainer: {
+    flex: 1,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#333',
-    marginBottom: 5,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 2,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    fontSize: 14,
+    color: '#fff',
+    fontWeight: '400',
+    opacity: 0.9,
   },
   loadingText: {
     fontSize: 16,
-    color: '#666',
+    color: '#333',
     textAlign: 'center',
   },
   noResultsTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   noResultsSubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#666',
     textAlign: 'center',
   },
   errorTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#e74c3c',
+    color: '#c0392b',
     textAlign: 'center',
     marginBottom: 10,
   },
   errorMessage: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 14,
+    color: '#333',
     textAlign: 'center',
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#4CAF50',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -227,8 +280,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   listContent: {
-    paddingHorizontal: 15,
-    paddingTop: 10,
+    padding: 20,
+    paddingTop: 0, // El header ya tiene margen inferior
   },
   itemContainer: {
     backgroundColor: 'white',
@@ -236,7 +289,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     borderRadius: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,

@@ -1,8 +1,9 @@
 // ejercicio_detalle.js
+import { Ionicons } from '@expo/vector-icons';
 import { Video } from 'expo-av';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getEjercicioDetalle } from '../../services/db';
 import GymButton from './gymbutton';
 
@@ -134,116 +135,139 @@ const EjercicioDetalleScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.loadingText}>Cargando ejercicio...</Text>
-      </View>
+      <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
+        <View style={styles.center}>
+          <View style={styles.centerCard}>
+            <Text style={styles.loadingText}>Cargando ejercicio...</Text>
+          </View>
+        </View>
+      </ImageBackground>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.errorTitle}>Error</Text>
-        <Text style={styles.errorMessage}>{error}</Text>
-        <TouchableOpacity 
-          style={styles.retryButton} 
-          onPress={fetchEjercicioDetalle}
-        >
-          <Text style={styles.retryButtonText}>Reintentar</Text>
-        </TouchableOpacity>
-      </View>
+      <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
+        <View style={styles.center}>
+          <View style={styles.centerCard}>
+            <Text style={styles.errorTitle}>Error</Text>
+            <Text style={styles.errorMessage}>{error}</Text>
+            <TouchableOpacity 
+              style={styles.retryButton} 
+              onPress={fetchEjercicioDetalle}
+            >
+              <Text style={styles.retryButtonText}>Reintentar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ImageBackground>
     );
   }
 
   if (!ejercicio) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.noResultsTitle}>Ejercicio no encontrado</Text>
-      </View>
+      <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
+        <View style={styles.center}>
+          <View style={styles.centerCard}>
+            <Text style={styles.noResultsTitle}>Ejercicio no encontrado</Text>
+          </View>
+        </View>
+      </ImageBackground>
     );
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Título del ejercicio */}
-        <View style={styles.headerContainer}>
-          <Text style={styles.title}>{ejercicio.nombre}</Text>
-          <Text style={styles.subtitle}>
-            Objetivo • {ejercicio.objetivo}
-          </Text>
-          <Text style={styles.subtitle}>
-            Frecuencia • {ejercicio.frecuencia}
-          </Text>
-        </View>
+      <ImageBackground source={require('../../assets/template.jpg')} style={styles.fullBackgroundImage} resizeMode="cover">
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          style={styles.scrollView}
+        >
+            <View style={styles.container}>
+              {/* Header con botón de retroceso */}
+              <View style={styles.header}>
+                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                  <Ionicons name="arrow-back" size={24} color="#fff" />
+                </TouchableOpacity>
+                <View style={styles.headerTextContainer}>
+                  <Text style={styles.title} numberOfLines={1}>{ejercicio.nombre}</Text>
+                  <Text style={styles.subtitle}>
+                    {ejercicio.objetivo} • {ejercicio.frecuencia}
+                  </Text>
+                </View>
+              </View>
+            </View>
 
-        {/* Video del ejercicio */}
-        {videoSource && (
-          <View style={styles.videoContainer}>
-            <Video
-              source={videoSource}
-              rate={1.0}
-              volume={1.0}
-              isMuted={true}
-              resizeMode="contain"
-              shouldPlay={true}
-              isLooping={true}
-              useNativeControls
-              style={styles.video}
-            />
-          </View>
-        )}
+          <View style={styles.contentArea}>
+            {/* Video del ejercicio */}
+            {videoSource && (
+              <View style={styles.videoContainer}>
+                <Video
+                  source={videoSource}
+                  rate={1.0}
+                  volume={1.0}
+                  isMuted={true}
+                  resizeMode="contain"
+                  shouldPlay={true}
+                  isLooping={true}
+                  useNativeControls
+                  style={styles.video}
+                />
+              </View>
+            )}
 
-        {/* Descripción del ejercicio */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Descripción</Text>
-          <Text style={styles.description}>{ejercicio.descripcion}</Text>
-        </View>
+            {/* Descripción del ejercicio */}
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Descripción</Text>
+              <Text style={styles.description}>{ejercicio.descripcion}</Text>
+            </View>
 
-        {/* Parámetros del ejercicio */}
-        <View style={styles.parametersContainer}>
-          <Text style={styles.sectionTitle}>Parámetros de Entrenamiento</Text>
-          
-          <View style={styles.parameterRow}>
-            <View style={styles.requirementRow}>
-            <Text style={styles.requirementLabel}>Series:</Text>
-            <Text style={styles.requirementValue}>{ejercicio.series}</Text>
-          </View>
-          <View style={styles.requirementRow}>
-            <Text style={styles.requirementLabel}>Repeticiones:</Text>
-            <Text style={styles.requirementValue}>{ejercicio.repeticiones}</Text>
-          </View>
-          <View style={styles.requirementRow}>
-            <Text style={styles.requirementLabel}>Descanso:</Text>
-            <Text style={styles.requirementValue}>{ejercicio.descanso} segundos</Text>
-          </View>
-        </View>
-        </View>
+            {/* Parámetros del ejercicio */}
+            <View style={styles.parametersContainer}>
+              <Text style={styles.sectionTitle}>Parámetros de Entrenamiento</Text>
 
-        {/* Botones de acción */}
-        <View style={[styles.buttonContainer, { alignItems: 'center', marginTop: 30 }]}>
-          <GymButton 
-            label="Ver más ejercicios" 
-            onPress={() => router.back()} // Usar router.back()
-          />
-          <GymButton 
-            label="Volver al inicio" 
-            onPress={() => router.push('/(tabs)/inicio')} // Usar router.push()
-          />
-        </View>
+              <View style={styles.parameterRow}>
+                <View style={styles.requirementRow}>
+                  <Text style={styles.requirementLabel}>Series:</Text>
+                  <Text style={styles.requirementValue}>{ejercicio.series}</Text>
+                </View>
+                <View style={styles.requirementRow}>
+                  <Text style={styles.requirementLabel}>Repeticiones:</Text>
+                  <Text style={styles.requirementValue}>{ejercicio.repeticiones}</Text>
+                </View>
+                <View style={styles.requirementRow}>
+                  <Text style={styles.requirementLabel}>Descanso:</Text>
+                  <Text style={styles.requirementValue}>{ejercicio.descanso} segundos</Text>
+                </View>
+              </View>
+            </View>
 
-        {/* Nota sobre el video */}
-        {!videoSource && (
-          <View style={styles.noVideoContainer}>
-            <Text style={styles.noVideoText}>
-              Video no disponible para este ejercicio
-            </Text>
+            {/* Botones de acción */}
+            <View style={[styles.buttonContainer, { alignItems: 'center', marginTop: 30 }]}>
+              <GymButton
+                label="Ver más ejercicios"
+                style={styles.actionButton}
+                onPress={() => router.back()} // Usar router.back()
+              />
+              <GymButton
+                label="Volver al inicio"
+                style={styles.actionButton}
+                onPress={() => router.push('/(tabs)/inicio')} // Usar router.push()
+              />
+            </View>
+
+            {/* Nota sobre el video */}
+            {!videoSource && (
+              <View style={styles.noVideoContainer}>
+                <Text style={styles.noVideoText}>
+                  Video no disponible para este ejercicio
+                </Text>
+              </View>
+            )}
           </View>
-        )}
-      </ScrollView>
+        </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -251,49 +275,81 @@ const EjercicioDetalleScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f4f4f9',
+    backgroundColor: '#000', // Fallback color for notch areas
+  },
+  fullBackgroundImage: {
+    flex: 1,
+  },
+  scrollView: {
+    backgroundColor: 'transparent',
+  },
+  container: {
+    padding: 20,
+    paddingTop: 60,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+  },
+  centerCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 12,
+    padding: 30,
+    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   scrollContent: {
     paddingBottom: 20,
   },
-  headerContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 25,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+  },
+  backButton: {
+    padding: 8,
+    marginRight: 12,
+    backgroundColor: '#4CAF50',
+    borderRadius: 8,
+  },
+  headerTextContainer: {
+    flex: 1,
   },
   title: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#333',
-    marginBottom: 8,
+    color: '#fff',
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    fontSize: 14,
+    color: '#fff',
+    opacity: 0.9,
+  },
+  contentArea: {
+    marginTop: -20, // Solapar ligeramente el header para un look más integrado
+    paddingHorizontal: 15,
   },
   videoContainer: {
-    margin: 20,
-    backgroundColor: 'white',
+    marginBottom: 15,
+    backgroundColor: '#4682B4',
     borderRadius: 12,
-    padding: 15,
+    padding: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    overflow: 'hidden', // Para que el video respete el borde redondeado
   },
   video: {
     width: '100%',
@@ -301,8 +357,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   sectionContainer: {
-    marginHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 15,
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 12,
@@ -324,7 +379,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   parametersContainer: {
-    marginHorizontal: 20,
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 12,
@@ -350,8 +404,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
+  actionButton: {
+    backgroundColor: '#4CAF50',
+  },
   noVideoContainer: {
-    marginHorizontal: 20,
+    marginHorizontal: 5,
     marginTop: 10,
     padding: 15,
     backgroundColor: '#fff3cd',
@@ -373,18 +430,18 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#e74c3c',
+    color: '#c0392b',
     textAlign: 'center',
     marginBottom: 10,
   },
   errorMessage: {
     fontSize: 16,
-    color: '#666',
+    color: '#333',
     textAlign: 'center',
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#4CAF50',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
