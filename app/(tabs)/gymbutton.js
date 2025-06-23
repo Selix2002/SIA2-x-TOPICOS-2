@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     width: '80%',
     minWidth: 250,
     marginBottom: 12,
-    borderRadius: 12, // Bordes más redondeados
+    borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,

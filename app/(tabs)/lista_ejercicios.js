@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 20,
-    paddingTop: 0, // El header ya tiene margen inferior
+    paddingTop: 0,
   },
   itemContainer: {
     backgroundColor: 'white',

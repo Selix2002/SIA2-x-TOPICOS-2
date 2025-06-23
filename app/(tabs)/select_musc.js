@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 10, // Reducido para dar más espacio al mapa
+    marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

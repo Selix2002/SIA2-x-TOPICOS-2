@@ -275,7 +275,7 @@ const EjercicioDetalleScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#000', // Fallback color for notch areas
+    backgroundColor: '#000',
   },
   fullBackgroundImage: {
     flex: 1,

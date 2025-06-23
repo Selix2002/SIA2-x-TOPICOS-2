@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   selectionInfo: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Fondo semi-transparente
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     padding: 15,
     borderRadius: 10,
     marginVertical: 10,
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   bottomButtonContainer: {
     width: '100%',
     alignItems: 'center',
-    marginBottom: 10, // Espacio desde la parte inferior
+    marginBottom: 10,
     paddingBottom: 20,
   },
   Button: {
