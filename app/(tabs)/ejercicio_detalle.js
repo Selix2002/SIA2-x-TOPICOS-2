@@ -1,7 +1,7 @@
 // ejercicio_detalle.js
 import { Ionicons } from '@expo/vector-icons';
-import { Video } from 'expo-av';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { VideoView, useVideoPlayer } from 'expo-video';
 import { useCallback, useEffect, useState } from 'react';
 import { ImageBackground, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getEjercicioDetalle } from '../../services/db';
@@ -89,6 +89,13 @@ const EjercicioDetalleScreen = () => {
   const [error, setError] = useState(null);
   const [videoSource, setVideoSource] = useState(null);
 
+  // Crear el reproductor de video
+  const player = useVideoPlayer(videoSource, (player) => {
+    player.loop = true;
+    player.muted = true;
+    player.play();
+  });
+
   const fetchEjercicioDetalle = useCallback(async () => {
     if (!ejercicioId || !frecuenciaId) {
       setError("Parámetros inválidos");
@@ -132,6 +139,16 @@ const EjercicioDetalleScreen = () => {
   useEffect(() => {
     fetchEjercicioDetalle();
   }, [fetchEjercicioDetalle]);
+
+  // Actualizar el reproductor cuando cambie el videoSource
+  useEffect(() => {
+    if (videoSource && player) {
+      // Usar replaceAsync para evitar bloqueos en el hilo principal en iOS
+      player.replaceAsync(videoSource).catch((error) => {
+        console.error('Error al cargar el video:', error);
+      });
+    }
+  }, [videoSource, player]);
 
   if (loading) {
     return (
@@ -203,16 +220,11 @@ const EjercicioDetalleScreen = () => {
             {/* Video del ejercicio */}
             {videoSource && (
               <View style={styles.videoContainer}>
-                <Video
-                  source={videoSource}
-                  rate={1.0}
-                  volume={1.0}
-                  isMuted={true}
-                  resizeMode="contain"
-                  shouldPlay={true}
-                  isLooping={true}
-                  useNativeControls
+                <VideoView
                   style={styles.video}
+                  player={player}
+                  allowsFullscreen
+                  allowsPictureInPicture
                 />
               </View>
             )}
