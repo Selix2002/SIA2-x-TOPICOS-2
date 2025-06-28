@@ -62,7 +62,7 @@ const InicioScreen = () => {
         nivel: frecuenciaNivel
       });
     }
-  }, [params.returnFrom, params.objetivoId, params.objetivoNombre, params.frecuenciaId, params.frecuenciaNivel]);
+  }, [params, selectedObjetivo, selectedFrecuencia]);
 
   const handleObjetivoPress = () => {
     // Pasar las selecciones actuales para preservarlas
