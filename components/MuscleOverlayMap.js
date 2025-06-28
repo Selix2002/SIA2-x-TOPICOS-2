@@ -7,6 +7,14 @@ import {
   View,
 } from "react-native";
 
+/**
+ * Componente que renderiza un mapa interactivo de músculos sobre una imagen del cuerpo humano
+ * Permite seleccionar diferentes grupos musculares mediante áreas táctiles superpuestas
+ * 
+ * @param {Object} props - Propiedades del componente
+ * @param {function} props.onMusclePress - Callback que se ejecuta al presionar un músculo
+ * @returns {JSX.Element} Mapa interactivo de músculos
+ */
 export default function MuscleOverlayMap({ onMusclePress }) {
   const { width: screenW } = Dimensions.get("window");
   const imgWidth = screenW * 0.9;

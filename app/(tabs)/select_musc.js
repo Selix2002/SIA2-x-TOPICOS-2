@@ -3,29 +3,46 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MuscleOverlayMap from "../../components/MuscleOverlayMap";
 
+/**
+ * Componente para la selección de músculos a entrenar
+ * Permite al usuario elegir qué músculo desea entrenar mediante un mapa interactivo
+ * Recibe parámetros de objetivo y frecuencia de entrenamiento desde la pantalla anterior
+ */
 const MuscleSelectionView = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
  
-  // Obtener los parámetros pasados desde la pantalla de inicio
+  // Obtener y parsear los parámetros pasados desde la pantalla de inicio
   const objetivoId = params.objetivoId ? parseInt(params.objetivoId) : 1;
   const objetivoNombre = params.objetivoNombre || 'Hipertrofia';
   const frecuenciaId = params.frecuenciaId ? parseInt(params.frecuenciaId) : 2;
   const frecuenciaNivel = params.frecuenciaNivel || '1–3 h/semana';
   
+  /**
+   * Mapeo de nombres de músculos a sus IDs numéricos
+   * Utilizado para convertir nombres de músculos seleccionados a identificadores
+   */
   const muscleNameToIdMap = {
     'abdominales': 2,
     'biceps': 1,
     'cuadriceps': 3
   };
 
+  /**
+   * Maneja la selección de un músculo específico
+   * Navega a la lista de ejercicios con todos los parámetros necesarios
+   * @param {string} muscleId - Nombre del músculo seleccionado
+   */
   const handleMuscleSelection = (muscleId) => {
     console.log("Músculo seleccionado:", muscleId);
     console.log("Con objetivo:", objetivoNombre, "ID:", objetivoId);
     console.log("Con frecuencia:", frecuenciaNivel, "ID:", frecuenciaId);
    
+    // Convertir nombre del músculo a ID numérico
     const musculo_id_numerico = muscleNameToIdMap[muscleId];
+    
     if (musculo_id_numerico) {
+      // Navegar a la lista de ejercicios con todos los parámetros
       router.push({
         pathname: '/(tabs)/lista_ejercicios',
         params: {
@@ -42,19 +59,23 @@ const MuscleSelectionView = () => {
     }
   };
 
+  /**
+   * Maneja el botón de retroceso para volver a la pantalla anterior
+   */
   const handleBackPress = () => {
     router.back();
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Fondo de imagen para toda la pantalla */}
       <ImageBackground 
         source={require('../../assets/template.jpg')} 
         style={styles.backgroundImage}
         resizeMode="cover"
       >
         <View style={styles.container}>
-          {/* Header con botón de retroceso */}
+          {/* Header con botón de retroceso y títulos */}
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
@@ -65,8 +86,9 @@ const MuscleSelectionView = () => {
             </View>
           </View>
 
-          {/* Cards de información */}
+          {/* Cards que muestran la información del objetivo y frecuencia seleccionados */}
           <View style={styles.infoContainer}>
+            {/* Card de objetivo */}
             <View style={styles.infoCard}>
               <View style={styles.infoItem}>
                 <View style={styles.infoIcon}>
@@ -77,6 +99,7 @@ const MuscleSelectionView = () => {
               </View>
             </View>
             
+            {/* Card de frecuencia */}
             <View style={styles.infoCard}>
               <View style={styles.infoItem}>
                 <View style={styles.infoIcon}>
@@ -88,10 +111,10 @@ const MuscleSelectionView = () => {
             </View>
           </View>
 
-          {/* Contenedor del mapa muscular */}
+          {/* Contenedor principal del mapa muscular y las instrucciones */}
           <View style={styles.bodyContainer}>
+            {/* Contenedor del mapa muscular interactivo */}
             <View style={styles.muscleMapContainer}>
-              {/* Overlay del mapa muscular */}
               <View style={styles.overlayContainer}>
                 <MuscleOverlayMap
                   onMusclePress={handleMuscleSelection}
@@ -99,7 +122,7 @@ const MuscleSelectionView = () => {
               </View>
             </View>
 
-            {/* Instrucciones */}
+            {/* Instrucciones para el usuario */}
             <View style={styles.instructionsContainer}>
               <Text style={styles.instructionsText}>
                 Toca cualquier músculo para ver ejercicios específicos
@@ -113,19 +136,23 @@ const MuscleSelectionView = () => {
 };
 
 const styles = StyleSheet.create({
+  // Contenedor principal con área segura
   safeArea: {
     flex: 1,
   },
+  // Imagen de fondo que cubre toda la pantalla
   backgroundImage: {
     flex: 1,
     width: '100%',
     height: '100%',
   },
+  // Contenedor principal con padding
   container: {
     flex: 1,
     padding: 20,
     paddingTop: 60,
   },
+  // Header con fondo semi-transparente
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -136,32 +163,38 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     marginBottom: 20,
   },
+  // Botón de retroceso con fondo verde
   backButton: {
     padding: 8,
     marginRight: 12,
     backgroundColor: 'rgba(76, 175, 80, 0.8)',
     borderRadius: 8,
   },
+  // Contenedor de textos del header
   headerTextContainer: {
     flex: 1,
   },
+  // Título principal del header
   headerTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: '#fff',
     marginBottom: 2,
   },
+  // Subtítulo del header
   headerSubtitle: {
     fontSize: 14,
     color: '#fff',
     fontWeight: '400',
     opacity: 0.9,
   },
+  // Contenedor de las cards de información
   infoContainer: {
     flexDirection: 'row',
     paddingVertical: 15,
     gap: 12,
   },
+  // Estilo individual de cada card de información
   infoCard: {
     flex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -176,9 +209,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  // Contenedor de elementos dentro de cada card
   infoItem: {
     alignItems: 'center',
   },
+  // Contenedor circular del ícono
   infoIcon: {
     width: 32,
     height: 32,
@@ -188,23 +223,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  // Etiqueta de la información (ej: "Objetivo")
   infoLabel: {
     fontSize: 12,
     color: '#555',
     fontWeight: '500',
     marginBottom: 4,
   },
+  // Valor de la información (ej: "Hipertrofia")
   infoValue: {
     fontSize: 14,
     color: '#000',
     fontWeight: '600',
     textAlign: 'center',
   },
+  // Contenedor principal del cuerpo (mapa + instrucciones)
   bodyContainer: {
     flex: 1,
     minHeight: 400, 
     paddingTop: 10,
   },
+  // Contenedor del mapa muscular con fondo blanco y sombra
   muscleMapContainer: {
     flex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -223,6 +262,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start', 
     alignItems: 'center', 
   },
+  // Contenedor del overlay del mapa muscular con tamaño reducido
   overlayContainer: {
     width: '40%', 
     height: '40%',
@@ -233,6 +273,7 @@ const styles = StyleSheet.create({
     marginTop: 100, 
     transform: [{ scale: 0.75 }],
   },
+  // Contenedor de las instrucciones con fondo verde
   instructionsContainer: {
     backgroundColor: '#4CAF50',
     borderRadius: 12,
@@ -247,6 +288,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  // Texto de las instrucciones
   instructionsText: {
     fontSize: 14,
     color: '#fff',

@@ -7,7 +7,11 @@ import { ImageBackground, SafeAreaView, ScrollView, StyleSheet, Text, TouchableO
 import { getEjercicioDetalle } from '../../services/db';
 import GymButton from './gymbutton';
 
-// Función para mapear ejercicios a videos (directamente en el archivo)
+/**
+ * Mapea nombres de ejercicios a sus videos correspondientes
+ * @param {string} exerciseName - Nombre exacto del ejercicio
+ * @returns {any|null} Archivo de video o null si no existe
+ */
 const getVideoForExercise = (exerciseName) => {
   const videoMap = {
     'Bicycle crunch': require('../../assets/vids//Bicycle_crunch.webm'),
@@ -41,7 +45,11 @@ const getVideoForExercise = (exerciseName) => {
   return videoMap[exerciseName] || null;
 };
 
-// Función alternativa para normalizar nombres si hay diferencias menores
+/**
+ * Función alternativa que normaliza nombres para manejo de diferencias menores
+ * @param {string} exerciseName - Nombre del ejercicio a normalizar
+ * @returns {any|null} Archivo de video o null si no existe
+ */
 const getVideoForExerciseNormalized = (exerciseName) => {
   const normalizedName = exerciseName.trim().toLowerCase();
   
@@ -77,25 +85,36 @@ const getVideoForExerciseNormalized = (exerciseName) => {
   return videoMapNormalized[normalizedName] || null;
 };
 
+/**
+ * Componente que muestra el detalle completo de un ejercicio
+ * Incluye video demostrativo, descripción y parámetros de entrenamiento
+ * @returns {JSX.Element} Pantalla de detalle del ejercicio
+ */
 const EjercicioDetalleScreen = () => {
   const params = useLocalSearchParams();
   const router = useRouter();
   
+  // Parsear parámetros de navegación
   const ejercicioId = params.ejercicioId ? parseInt(String(params.ejercicioId), 10) : null;
   const frecuenciaId = params.frecuenciaId ? parseInt(String(params.frecuenciaId), 10) : null;
 
-  const [ejercicio, setEjercicio] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [videoSource, setVideoSource] = useState(null);
+  // Estados del componente
+  const [ejercicio, setEjercicio] = useState(null); // Datos del ejercicio
+  const [loading, setLoading] = useState(true); // Estado de carga
+  const [error, setError] = useState(null); // Manejo de errores
+  const [videoSource, setVideoSource] = useState(null); // Fuente del video
 
-  // Crear el reproductor de video
+  // Configurar reproductor de video con autoplay y loop
   const player = useVideoPlayer(videoSource, (player) => {
     player.loop = true;
     player.muted = true;
     player.play();
   });
 
+  /**
+   * Obtiene los detalles del ejercicio desde la base de datos
+   * Incluye validación de parámetros y manejo de videos
+   */
   const fetchEjercicioDetalle = useCallback(async () => {
     if (!ejercicioId || !frecuenciaId) {
       setError("Parámetros inválidos");
@@ -107,21 +126,23 @@ const EjercicioDetalleScreen = () => {
       setLoading(true);
       setError(null);
       
+      // Obtener datos del ejercicio
       const data = await getEjercicioDetalle(ejercicioId, frecuenciaId);
       
       if (data) {
         setEjercicio(data);
         
-        // Obtener el video correspondiente al ejercicio
+        // Buscar video correspondiente - primero intento exacto
         let video = getVideoForExercise(data.nombre);
         
-        // Si no encuentra el video con el nombre exacto, intentar con normalización
+        // Si no encuentra, intentar con normalización
         if (!video) {
           video = getVideoForExerciseNormalized(data.nombre);
         }
         
         setVideoSource(video);
         
+        // Log de advertencia si no hay video disponible
         if (!video) {
           console.warn(`No se encontró video para el ejercicio: ${data.nombre}`);
         }
@@ -136,20 +157,22 @@ const EjercicioDetalleScreen = () => {
     }
   }, [ejercicioId, frecuenciaId]);
 
+  // Efecto para cargar datos al montar el componente
   useEffect(() => {
     fetchEjercicioDetalle();
   }, [fetchEjercicioDetalle]);
 
-  // Actualizar el reproductor cuando cambie el videoSource
+  // Efecto para actualizar el reproductor cuando cambie el video
   useEffect(() => {
     if (videoSource && player) {
-      // Usar replaceAsync para evitar bloqueos en el hilo principal en iOS
+      // Usar replaceAsync para evitar bloqueos en iOS
       player.replaceAsync(videoSource).catch((error) => {
         console.error('Error al cargar el video:', error);
       });
     }
   }, [videoSource, player]);
 
+  // Pantalla de carga
   if (loading) {
     return (
       <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
@@ -162,6 +185,7 @@ const EjercicioDetalleScreen = () => {
     );
   }
 
+  // Pantalla de error con opción de reintentar
   if (error) {
     return (
       <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
@@ -181,6 +205,7 @@ const EjercicioDetalleScreen = () => {
     );
   }
 
+  // Pantalla cuando no se encuentra el ejercicio
   if (!ejercicio) {
     return (
       <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
@@ -193,6 +218,7 @@ const EjercicioDetalleScreen = () => {
     );
   }
 
+  // Pantalla principal del detalle del ejercicio
   return (
     <SafeAreaView style={styles.safeArea}>
       <ImageBackground source={require('../../assets/template.jpg')} style={styles.fullBackgroundImage} resizeMode="cover">
@@ -202,7 +228,7 @@ const EjercicioDetalleScreen = () => {
           style={styles.scrollView}
         >
             <View style={styles.container}>
-              {/* Header con botón de retroceso */}
+              {/* Header con navegación y título */}
               <View style={styles.header}>
                 <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                   <Ionicons name="arrow-back" size={24} color="#fff" />
@@ -217,7 +243,7 @@ const EjercicioDetalleScreen = () => {
             </View>
 
           <View style={styles.contentArea}>
-            {/* Video del ejercicio */}
+            {/* Reproductor de video demostrativo */}
             {videoSource && (
               <View style={styles.videoContainer}>
                 <VideoView
@@ -229,13 +255,13 @@ const EjercicioDetalleScreen = () => {
               </View>
             )}
 
-            {/* Descripción del ejercicio */}
+            {/* Sección de descripción del ejercicio */}
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Descripción</Text>
               <Text style={styles.description}>{ejercicio.descripcion}</Text>
             </View>
 
-            {/* Parámetros del ejercicio */}
+            {/* Parámetros de entrenamiento (series, reps, descanso) */}
             <View style={styles.parametersContainer}>
               <Text style={styles.sectionTitle}>Parámetros de Entrenamiento</Text>
 
@@ -255,21 +281,21 @@ const EjercicioDetalleScreen = () => {
               </View>
             </View>
 
-            {/* Botones de acción */}
+            {/* Botones de navegación */}
             <View style={[styles.buttonContainer, { alignItems: 'center', marginTop: 30 }]}>
               <GymButton
                 label="Ver más ejercicios"
                 style={styles.actionButton}
-                onPress={() => router.back()} // Usar router.back()
+                onPress={() => router.back()} // Volver a la lista anterior
               />
               <GymButton
                 label="Volver al inicio"
                 style={styles.actionButton}
-                onPress={() => router.push('/(tabs)/inicio')} // Usar router.push()
+                onPress={() => router.push('/(tabs)/inicio')} // Ir a pantalla principal
               />
             </View>
 
-            {/* Nota sobre el video */}
+            {/* Mensaje cuando no hay video disponible */}
             {!videoSource && (
               <View style={styles.noVideoContainer}>
                 <Text style={styles.noVideoText}>
@@ -297,7 +323,7 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 60, // Espacio para status bar
   },
   center: {
     flex: 1,
@@ -305,11 +331,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   centerCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)', // Fondo semitransparente
     borderRadius: 12,
     padding: 30,
     width: '80%',
     alignItems: 'center',
+    // Sombras para elevación visual
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -317,12 +344,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 20, // Espacio al final del scroll
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Fondo semitransparente
     borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 15,
@@ -330,7 +357,7 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
     marginRight: 12,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4CAF50', // Verde de la app
     borderRadius: 8,
   },
   headerTextContainer: {
@@ -345,15 +372,15 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#fff',
-    opacity: 0.9,
+    opacity: 0.9, // Texto ligeramente transparente
   },
   contentArea: {
-    marginTop: -20, // Solapar ligeramente el header para un look más integrado
+    marginTop: -20, // Solapar header para look integrado
     paddingHorizontal: 15,
   },
   videoContainer: {
     marginBottom: 15,
-    backgroundColor: '#4682B4',
+    backgroundColor: '#4682B4', // Azul acero
     borderRadius: 12,
     padding: 10,
     shadowColor: '#000',
@@ -361,7 +388,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    overflow: 'hidden', // Para que el video respete el borde redondeado
+    overflow: 'hidden', // Respetar bordes redondeados
   },
   video: {
     width: '100%',
@@ -373,6 +400,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 12,
+    // Sombras sutiles
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -388,7 +416,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     color: '#555',
-    lineHeight: 24,
+    lineHeight: 24, // Mejor legibilidad
   },
   parametersContainer: {
     backgroundColor: 'white',
@@ -405,7 +433,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#eee', // Separador sutil
   },
   requirementLabel: {
     fontSize: 16,
@@ -417,20 +445,20 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   actionButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4CAF50', // Verde consistente
   },
   noVideoContainer: {
     marginHorizontal: 5,
     marginTop: 10,
     padding: 15,
-    backgroundColor: '#fff3cd',
+    backgroundColor: '#fff3cd', // Amarillo claro de advertencia
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#ffc107',
+    borderLeftColor: '#ffc107', // Borde amarillo
   },
   noVideoText: {
     fontSize: 14,
-    color: '#856404',
+    color: '#856404', // Texto amarillo oscuro
     textAlign: 'center',
     fontStyle: 'italic',
   },
@@ -442,7 +470,7 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#c0392b',
+    color: '#c0392b', // Rojo de error
     textAlign: 'center',
     marginBottom: 10,
   },

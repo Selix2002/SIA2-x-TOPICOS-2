@@ -1,4 +1,3 @@
-// inicio.js (con imagen de fondo, botones verdes y logo)
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Image, ImageBackground, SafeAreaView, StyleSheet, View } from 'react-native';

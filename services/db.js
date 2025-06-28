@@ -1,7 +1,12 @@
 import * as SQLite from 'expo-sqlite';
 
+// Inicialización de la base de datos SQLite
 const db = SQLite.openDatabaseSync('app.db');
 
+/**
+ * Inicializa la base de datos creando las tablas necesarias y poblándolas con datos iniciales
+ * Utiliza una transacción para asegurar la integridad de los datos
+ */
 export async function initDB() {
   await db.withTransactionAsync(async () => {
     // Crear tablas
@@ -51,6 +56,10 @@ export async function initDB() {
   });
 }
 
+/**
+ * Inserta los datos iniciales en todas las tablas de la base de datos
+ * Incluye músculos, objetivos, frecuencias, ejercicios y parámetros de entrenamiento
+ */
 async function insertInitialData() {
   // Insertar músculos
   const musculos = ['Bíceps', 'Abdomen', 'Cuádriceps'];
@@ -177,7 +186,10 @@ async function insertInitialData() {
   }
 }
 
-// Función interna para limpiar duplicados automáticamente
+/**
+ * Función interna para eliminar registros duplicados automáticamente
+ * Se ejecuta después de insertar datos para mantener la integridad
+ */
 async function cleanDuplicatesInternal() {
   console.log('🧹 Limpiando duplicados automáticamente...');
   
@@ -208,6 +220,12 @@ async function cleanDuplicatesInternal() {
   }
 }
 
+/**
+ * Obtiene rutinas de ejercicios filtradas por objetivo y frecuencia
+ * @param {string} objetivo - Nombre del objetivo de entrenamiento
+ * @param {string} frecuencia - Nivel de frecuencia de entrenamiento
+ * @returns {Array} Lista de ejercicios con sus parámetros
+ */
 export async function getRutinas(objetivo, frecuencia) {
   return db.getAllAsync(`
     SELECT e.nombre, e.descripcion, p.series, p.repeticiones, p.descanso 
@@ -220,22 +238,44 @@ export async function getRutinas(objetivo, frecuencia) {
   `, [frecuencia, objetivo]);
 }
 
+/**
+ * Obtiene todos los objetivos de entrenamiento disponibles
+ * @returns {Array} Lista de objetivos con id y nombre
+ */
 export async function getObjetivos() {
   return db.getAllAsync(`SELECT * FROM objetivos`);
 }
 
+/**
+ * Obtiene todas las frecuencias de entrenamiento disponibles
+ * @returns {Array} Lista de frecuencias con id y nivel
+ */
 export async function getFrecuencias() {
   return db.getAllAsync(`SELECT * FROM frecuencias`);
 }
 
+/**
+ * Obtiene todos los ejercicios de la base de datos
+ * @returns {Array} Lista completa de ejercicios
+ */
 export async function getEjercicios() {
   return db.getAllAsync(`SELECT * FROM ejercicios`);
 }
 
+/**
+ * Obtiene un ejercicio específico por su ID
+ * @param {number} id - ID del ejercicio
+ * @returns {Object} Datos del ejercicio o null si no existe
+ */
 export async function getEjercicioId(id) {
   return db.getAsync(`SELECT * FROM ejercicios WHERE id = ?`, [id]);
 }
 
+/**
+ * Obtiene los músculos que tienen ejercicios para un objetivo específico
+ * @param {number} objetivoId - ID del objetivo de entrenamiento
+ * @returns {Array} Lista de músculos únicos con ejercicios para ese objetivo
+ */
 export async function getMusculosPorObjetivo(objetivoId) {
   return db.getAllAsync(`
     SELECT DISTINCT m.id, m.nombre 
@@ -245,7 +285,12 @@ export async function getMusculosPorObjetivo(objetivoId) {
   `, [objetivoId]);
 }
 
-// Obtener detalles completos de un ejercicio
+/**
+ * Obtiene los detalles completos de un ejercicio incluyendo parámetros de entrenamiento
+ * @param {number} ejercicioId - ID del ejercicio
+ * @param {number} frecuenciaId - ID de la frecuencia de entrenamiento
+ * @returns {Object} Detalles completos del ejercicio con parámetros
+ */
 export async function getEjercicioDetalle(ejercicioId, frecuenciaId) {
   return await db.getFirstAsync(`
     SELECT 
@@ -264,7 +309,12 @@ export async function getEjercicioDetalle(ejercicioId, frecuenciaId) {
   `, [ejercicioId, frecuenciaId]);
 }
 
-// Función para obtener ejercicios por músculo con limpieza automática adicional
+/**
+ * Obtiene ejercicios filtrados por músculo y objetivo con limpieza automática de duplicados
+ * @param {number} musculoId - ID del músculo
+ * @param {number} objetivoId - ID del objetivo
+ * @returns {Array} Lista de ejercicios únicos para el músculo y objetivo especificados
+ */
 export async function getEjerciciosPorMusculo(musculoId, objetivoId) {
   try {
     const ejercicios = await db.getAllAsync(
@@ -292,7 +342,13 @@ export async function getEjerciciosPorMusculo(musculoId, objetivoId) {
   }
 }
 
-// Funciones de debug (mantener para desarrollo)
+// === FUNCIONES DE DESARROLLO Y DEBUG ===
+
+/**
+ * Función para depurar y mostrar estadísticas de la base de datos
+ * Útil durante desarrollo para verificar la integridad de los datos
+ * @returns {Object} Estadísticas de la base de datos
+ */
 export async function debugDatabase() {
   console.log('🔍 === DEBUG DATABASE ===');
   
@@ -324,6 +380,10 @@ export async function debugDatabase() {
   };
 }
 
+/**
+ * Resetea completamente la base de datos eliminando todas las tablas y recreándolas
+ * Función de desarrollo para empezar desde cero
+ */
 export async function resetDatabase() {
   console.log('🔄 Reseteando base de datos...');
   

@@ -1,29 +1,38 @@
-// lista_ejercicios.js (limpio y optimizado)
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { FlatList, ImageBackground, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getEjerciciosPorMusculo } from '../../services/db';
 
+/**
+ * Pantalla que muestra una lista de ejercicios filtrados por músculo y objetivo
+ * Incluye manejo de estados de carga, error y navegación hacia detalles
+ */
 const ListaEjerciciosScreen = () => {
   const params = useLocalSearchParams();
   const router = useRouter();
 
-  // Conversión de parámetros con validación
+  // Conversión y validación de parámetros recibidos desde la navegación
   const musculoId = params.musculoId ? parseInt(String(params.musculoId), 10) : null;
   const objetivoId = params.objetivoId ? parseInt(String(params.objetivoId), 10) : null;
   const frecuenciaId = params.frecuenciaId ? parseInt(String(params.frecuenciaId), 10) : 2;
   
+  // Parámetros para mostrar información contextual en la UI
   const nombreMusculo = params.nombreMusculo || "Músculo";
   const objetivoNombre = params.objetivoNombre || "Objetivo";
   const frecuenciaNivel = params.frecuenciaNivel || "1–3 h/semana";
 
+  // Estados para manejo de datos y UI
   const [ejercicios, setEjercicios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Función memoizada para evitar recreaciones innecesarias
+  /**
+   * Función memoizada para cargar ejercicios desde la base de datos
+   * Incluye validación de parámetros y filtrado de duplicados
+   */
   const fetchEjercicios = useCallback(async () => {
+    // Validar que se recibieron los parámetros obligatorios
     if (musculoId === null || objetivoId === null) {
       console.warn("MusculoId u ObjetivoId no proporcionados a ListaEjerciciosScreen");
       setLoading(false);
@@ -36,15 +45,17 @@ const ListaEjerciciosScreen = () => {
       setError(null);
       console.log(`Buscando ejercicios para musculoId: ${musculoId}, objetivoId: ${objetivoId}`);
       
+      // Obtener ejercicios desde el servicio de base de datos
       const data = await getEjerciciosPorMusculo(musculoId, objetivoId);
       
-      // Validar que data es un array y no está vacío
+      // Validar que data es un array y procesar resultados
       if (Array.isArray(data)) {
         // Filtrar duplicados localmente como medida de seguridad adicional
         const uniqueData = data.filter((item, index, self) => 
           index === self.findIndex(t => t.id === item.id)
         );
         
+        // Advertir si se encontraron duplicados
         if (data.length !== uniqueData.length) {
           console.warn(`⚠️ Se encontraron duplicados locales: ${data.length} total, ${uniqueData.length} únicos`);
         }
@@ -62,12 +73,17 @@ const ListaEjerciciosScreen = () => {
     } finally {
       setLoading(false);
     }
-  }, [musculoId, objetivoId]);
+  }, [musculoId, objetivoId]); // Dependencias: solo reejecutar si cambian los IDs
 
+  // Cargar ejercicios al montar el componente o cambiar fetchEjercicios
   useEffect(() => {
     fetchEjercicios();
   }, [fetchEjercicios]);
 
+  /**
+   * Navega hacia la pantalla de detalle del ejercicio seleccionado
+   * @param {number} ejercicioId - ID del ejercicio a ver en detalle
+   */
   const handleEjercicioPress = useCallback((ejercicioId) => {
     router.push({
       pathname: '/(tabs)/ejercicio_detalle',
@@ -78,9 +94,13 @@ const ListaEjerciciosScreen = () => {
     });
   }, [router, frecuenciaId]);
 
+  // Función para volver a la pantalla anterior
   const handleBackPress = () => router.back();
 
-  // Función para renderizar cada item (memoizada)
+  /**
+   * Renderiza cada elemento de la lista de ejercicios
+   * Memoizado para evitar re-renders innecesarios
+   */
   const renderEjercicio = useCallback(({ item }) => (
     <TouchableOpacity 
       style={styles.itemContainer} 
@@ -93,6 +113,7 @@ const ListaEjerciciosScreen = () => {
     </TouchableOpacity>
   ), [handleEjercicioPress]);
 
+  // Estado de carga: mostrar indicador centrado
   if (loading) {
     return (
       <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
@@ -105,6 +126,7 @@ const ListaEjerciciosScreen = () => {
     );
   }
 
+  // Estado de error: mostrar mensaje con botón de reintentar
   if (error) {
     return (
       <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
@@ -124,6 +146,7 @@ const ListaEjerciciosScreen = () => {
     );
   }
 
+  // Estado sin resultados: mostrar mensaje informativo
   if (!ejercicios || ejercicios.length === 0) {
     return (
       <ImageBackground source={require('../../assets/template.jpg')} style={styles.backgroundImage} resizeMode="cover">
@@ -141,6 +164,7 @@ const ListaEjerciciosScreen = () => {
     );
   }
 
+  // Estado exitoso: mostrar lista de ejercicios
   return (
     <SafeAreaView style={styles.safeArea}>
       <ImageBackground
@@ -149,6 +173,7 @@ const ListaEjerciciosScreen = () => {
         resizeMode="cover"
       >
         <View style={styles.container}>
+          {/* Header con botón de regreso y título contextual */}
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
@@ -161,15 +186,17 @@ const ListaEjerciciosScreen = () => {
             </View>
           </View>
           
+          {/* Lista optimizada de ejercicios */}
           <FlatList
             data={ejercicios}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.id.toString()} // Clave única para cada elemento
             renderItem={renderEjercicio}
             contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
-            removeClippedSubviews={true}
-            maxToRenderPerBatch={10}
-            windowSize={10}
+            showsVerticalScrollIndicator={false} // Ocultar indicador de scroll
+            // Optimizaciones de rendimiento para listas grandes
+            removeClippedSubviews={true} // Remover vistas fuera de pantalla
+            maxToRenderPerBatch={10} // Renderizar máximo 10 elementos por lote
+            windowSize={10} // Ventana de elementos mantenidos en memoria
           />
         </View>
       </ImageBackground>
@@ -177,7 +204,9 @@ const ListaEjerciciosScreen = () => {
   );
 };
 
+// Estilos del componente organizados por sección
 const styles = StyleSheet.create({
+  // Contenedores principales
   safeArea: {
     flex: 1,
   },
@@ -189,29 +218,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 60, // Espacio extra para el header
   },
+  
+  // Estilos para estados centralizados (loading, error, sin resultados)
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   centerCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)', // Fondo semi-transparente
     borderRadius: 12,
     padding: 30,
     width: '80%',
     alignItems: 'center',
+    // Sombra para iOS
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
+    // Elevación para Android
     elevation: 5,
   },
+  
+  // Estilos del header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Fondo oscuro semi-transparente
     borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 15,
@@ -220,11 +255,11 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
     marginRight: 12,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4CAF50', // Verde del tema
     borderRadius: 8,
   },
   headerTextContainer: {
-    flex: 1,
+    flex: 1, // Ocupar espacio restante
   },
   title: {
     fontSize: 20,
@@ -236,8 +271,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#fff',
     fontWeight: '400',
-    opacity: 0.9,
+    opacity: 0.9, // Texto secundario más sutil
   },
+  
+  // Estilos de texto para diferentes estados
   loadingText: {
     fontSize: 16,
     color: '#333',
@@ -258,7 +295,7 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#c0392b',
+    color: '#c0392b', // Rojo para errores
     textAlign: 'center',
     marginBottom: 10,
   },
@@ -279,15 +316,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  
+  // Estilos de la lista y elementos
   listContent: {
     padding: 20,
-    paddingTop: 0,
+    paddingTop: 0, // Sin padding superior extra
   },
   itemContainer: {
     backgroundColor: 'white',
     padding: 20,
     marginVertical: 8,
     borderRadius: 12,
+    // Sombra sutil para separar elementos
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -303,7 +343,7 @@ const styles = StyleSheet.create({
   itemDescription: {
     fontSize: 14,
     color: '#666',
-    lineHeight: 20,
+    lineHeight: 20, // Mejora legibilidad del texto
   },
 });
 
