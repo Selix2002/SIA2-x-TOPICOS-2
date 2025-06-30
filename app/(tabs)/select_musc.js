@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 100, 
-    transform: [{ scale: 0.75 }],
+    transform: [{ scale: 0.72 }],
   },
   // Contenedor de las instrucciones con fondo verde
   instructionsContainer: {
