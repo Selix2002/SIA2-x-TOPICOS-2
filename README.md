@@ -122,7 +122,7 @@ assets/
 
 ## 🧑‍💻 Integrantes del proyecto
 
-- Sebastián Ramirez
+- Sebastián Muñoz
 - Diego Galindo
 - Fernando Garay
 ## Notas
